@@ -1,0 +1,77 @@
+﻿\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage[a4paper,margin=3cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\sisetup{output-decimal-marker={,},group-separator={.},group-minimum-digits=3}
+
+\title{Projeto Final de Ciência de Dados para Engenheiros\\Relatório Técnico -- Módulo 1}
+\author{Vinícius César Sena Torres -- RA 22409225}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Este relatório documenta o módulo de clusterização hierárquica aplicado à base de \num{550068} transações do Walmart. A análise exploratória inicial demonstrou ticket médio de R$\num{9263.97}, mediana de R$\num{8047.00} e coeficiente de assimetria \num{0.60}, confirmando a presença de cauda longa no gasto. Após o pré-processamento, as variáveis comportamentais foram normalizadas e reduzidas por PCA, possibilitando agrupar \num{5891} usuários em macroperfis com interpretação de negócio clara.
+\end{abstract}
+
+\section{Introdução}
+A etapa de EDA mostrou que os usuários realizam compras em \num{3631} produtos distribuídos em vinte categorias, sendo as mais recorrentes 5, 1 e 8 (juntas, \num{73}\% das transações). As cidades do tipo C foram responsáveis pelo ticket médio mais alto (R$\num{9719.92}), reforçando a necessidade de segmentar clientes segundo intensidade e variedade de consumo. O objetivo deste módulo é traduzir esses padrões em clusters estatisticamente defensáveis para embasar personalização, campanhas e recomendações.
+
+\section{Metodologia}
+Foram executadas as seguintes etapas:
+\begin{itemize}
+    \item \textbf{Análise exploratória}: consolidação de estatísticas descritivas, distribuição por faixa etária/gênero e avaliação de cauda longa para justificar métricas robustas.
+    \item \textbf{Pré-processamento}: imputação de \textit{Product\_Category} faltante com -1, transformação de \textit{Stay\_In\_Current\_City\_Years} para valores numéricos e codificação ordinal das faixas etárias.
+    \item \textbf{Engenharia de atributos}: agregação por usuário gerando métricas de volume (total de compras, gasto acumulado), intensidade (ticket médio, desvio) e variedade (produtos/categorias únicas), além da participação nas cinco categorias mais vendidas (5, 1, 8, 11 e 2).
+    \item \textbf{Normalização e PCA}: padronização por \textit{z-score} e redução para 12 componentes principais, suficientes para explicar \num{92.6}\% da variância acumulada.
+    \item \textbf{Clusterização}: aplicação do método aglomerativo de Ward (distância euclidiana). A silhueta foi calculada para $k \in [2,6]$; o melhor valor foi $k=2$, com silhueta \num{0.19}, adequado para macrosegmentação.
+\end{itemize}
+
+\section{Resultados e Discussão}
+A Tabela~\ref{tab:clusters} sintetiza os segmentos encontrados.
+
+\begin{table}[H]
+    \centering
+    \caption{Síntese dos clusters hierárquicos}
+    \label{tab:clusters}
+    \begin{tabular}{lrrrrrr}
+        \toprule
+        Cluster & Usuários (\%) & Compras méd. & Total gasto méd. (R$) & Ticket méd. (R$) & Cat. únicas & Freq./ano \\
+        \midrule
+        C0 & \num{86.7} & \num{62.7} & \num{602398.13} & \num{9676.59} & \num{8.88} & \num{41.76} \\
+        C1 & \num{13.3} & \num{293.8} & \num{2578241.51} & \num{8865.92} & \num{14.57} & \num{202.77} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+O \textbf{Cluster C0} (\num{86.7}\% dos usuários) reúne compradores casuais: média de 63 compras distribuídas ao longo de quase dois anos (\num{41.8} compras/ano) e ticket médio de R$\num{9676.59}. A participação em categorias é equilibrada entre 5 (\num{32.0}\%), 1 (\num{31.8}\%) e 8 (\num{26.2}\%), em linha com o que foi observado na EDA. Aproximadamente \num{71}\% dos integrantes são homens e a idade média codificada (\num{2.69}) aponta para as faixas de 26--45 anos.
+
+O \textbf{Cluster C1} (\num{13.3}\%) concentra os \emph{heavy users}: média de 294 compras (mais de \num{202} compras/ano), gasto acumulado quatro vezes maior que o grupo casual e variedade de \num{14.6} categorias. Embora o ticket médio unitário seja ligeiramente menor, o volume compensa e justifica benefícios de fidelidade. A categoria 5 responde por \num{35.6}\% da cesta e a presença masculina chega a \num{76}\%, indicando afinidade com combos premium.
+
+O dendrograma reforça a separação em dois níveis: primeiro isolam-se consumidores de altíssima recorrência (C1) e, posteriormente, subdivisões de menor estabilidade em C0. Apesar da silhueta absoluta moderada, as métricas de volume, variedade e composição demográfica sustentam a segmentação macro.
+
+\section{Recomendações}
+\begin{enumerate}
+    \item Oferecer benefícios progressivos (frete grátis, pré-lançamentos) ao Cluster C1, que sozinho movimenta mais de R$\num{2.5e6} por usuário.
+    \item Para o Cluster C0, trabalhar kits pré-montados envolvendo categorias 1, 5 e 8, buscando elevar a variedade média de \num{8.9} para níveis próximos aos heavy users.
+    \item Monitorar trimestralmente as componentes principais: variações acima de \num{5}\% na variância explicada indicarão mudanças estruturais na cesta e possíveis reclassificações.
+\end{enumerate}
+
+\section{Conclusão}
+A combinação de EDA e clusterização hierárquica revelou dois perfis dominantes: compradores ocasionais de alto ticket por evento e heavy users extremamente frequentes. O pipeline (pré-processamento, PCA e validação com silhueta) assegura rastreabilidade e fornece insumos objetivos para campanhas, recomendações e monitoramento contínuo do comportamento de consumo.
+
+\begin{thebibliography}{9}
+\bibitem{dataset} Kaggle. \emph{Black Friday Data Set}. Disponível em: \url{https://www.kaggle.com}. Acesso em: \today.
+\bibitem{tan} TAN, Pang-Ning; STEINBACH, Michael; KUMAR, Vipin. \emph{Introduction to Data Mining}. Pearson, 2018.
+\end{thebibliography}
+
+\end{document}

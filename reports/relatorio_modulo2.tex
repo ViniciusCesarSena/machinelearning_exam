@@ -1,0 +1,77 @@
+﻿\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage[a4paper,margin=3cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\sisetup{output-decimal-marker={,},group-separator={.},group-minimum-digits=3}
+
+\title{Projeto Final de Ciência de Dados para Engenheiros\\Relatório Técnico -- Módulo 2}
+\author{Vinícius César Sena Torres -- RA 22409225}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Este documento descreve a mineração de regras associativas para identificar padrões de coocorrência entre os produtos mais vendidos do e-commerce. O algoritmo Apriori foi aplicado ao conjunto de \num{5789} cestas (usuários) contendo os 50 itens mais populares, com suporte mínimo de 3\% e confidência mínima de 30\%. As regras extraídas apresentam lift acima de 1,05, assegurando ganho real sobre a compra independente.
+\end{abstract}
+
+\section{Introdução}
+A identificação de itens comprados em conjunto sustenta promoções cruzadas, kits e recomendações personalizadas. Utilizamos a mesma base do Módulo 1 e nos concentramos nos produtos líderes (P00265242 sozinho aparece em \num{32.5}\% das cestas) para garantir significância estatística e facilidade de implementação comercial.
+
+\section{Metodologia}
+\begin{itemize}
+    \item \textbf{Seleção de itens}: recortei os 50 produtos com maior frequência; juntos eles representam \num{84}\% de todas as transações do período.
+    \item \textbf{Formatação das cestas}: construí matriz binária \(5789 \times 50\), onde cada linha corresponde a um usuário e cada coluna indica a presença do produto.
+    \item \textbf{Geração de itemsets}: Apriori com suporte mínimo de 3\% resultou em \num{3028} combinações frequentes.
+    \item \textbf{Filtragem de regras}: calculei confidência e lift, retendo \num{6230} regras com confidência \(\geq 30\%\) e lift superior a 1,05.
+    \item \textbf{Visualizações}: gráficos de suporte vs. confidência e mapa de calor das doze principais referências para interpretar hubs de coocorrência (familias de produtos 5 e 1).
+\end{itemize}
+
+\section{Resultados e Discussão}
+A Tabela~\ref{tab:regras} apresenta as cinco regras com maior lift. Todas envolvem pares de produtos que aumentam substancialmente a probabilidade de adquirir itens complementares, em especial o código P00111142.
+
+\begin{table}[H]
+    \centering
+    \caption{Principais regras associativas}
+    \label{tab:regras}
+    \begin{tabular}{p{5cm}p{3cm}ccc}
+        \toprule
+        Antecedentes & Consequente & Suporte (\%) & Confidência (\%) & Lift \\
+        \midrule
+        P00102642, P00112542 & P00111142 & \num{3.18} & \num{49.9} & \num{2.84} \\
+        P00086442, P00112542 & P00111142 & \num{3.13} & \num{49.3} & \num{2.81} \\
+        P00058042, P00080342 & P00113242 & \num{3.07} & \num{44.6} & \num{2.77} \\
+        P00112542, P00145042 & P00111142 & \num{3.39} & \num{48.5} & \num{2.77} \\
+        P00112142, P00112542 & P00111142 & \num{3.78} & \num{48.5} & \num{2.76} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Observa-se que o produto P00112542 aparece em quatro das cinco regras principais, funcionando como hub de conveniência: sempre que combinado com P00102642, P00145042 ou P00112142, a probabilidade de P00111142 ser comprado aumenta em quase 180\% (lift $>2.7$). Já a dupla (P00058042, P00080342) é altamente preditiva para P00113242, sugerindo kits naturais para campanhas de eletrônicos.
+
+O diagrama suporte vs. confidência mostrou concentração de regras sólidas entre 3\% e 5\% de suporte, faixa considerada aplicável para promoções em massa. O mapa de calor das coocorrências confirmou que itens das categorias 5 e 1 compartilham boa parte dos clientes, reforçando a necessidade de ações coordenadas entre essas famílias.
+
+\section{Recomendações}
+\begin{enumerate}
+    \item Criar pacotes promocionais envolvendo P00112542 e P00111142, com descontos progressivos ou sugestões automáticas no carrinho, dado o lift superior a 2,8.
+    \item Utilizar as regras com suporte \(>3\%\) como gatilhos de recomendações no checkout e em campanhas digitais, pois atingem massa crítica de clientes.
+    \item Monitorar trimestralmente o portfólio: novos hubs podem surgir; caso o mix se diversifique, reduzir o suporte mínimo para 2\% garantirá a descoberta de nichos emergentes.
+\end{enumerate}
+
+\section{Conclusão}
+O módulo de regras associativas estruturou evidências quantitativas para promoções cruzadas. A seleção criteriosa dos itens e o controle de suporte/confidência asseguram que os insights não sejam fruto de ruído e podem ser traduzidos diretamente em banners, recomendações e políticas de precificação dinâmica.
+
+\begin{thebibliography}{9}
+\bibitem{dataset} Kaggle. \emph{Black Friday Data Set}. Disponível em: \url{https://www.kaggle.com}. Acesso em: \today.
+\bibitem{han} HAN, Jiawei; PEI, Jian; KAMBER, Micheline. \emph{Data Mining: Concepts and Techniques}. 4. ed. Elsevier, 2022.
+\end{thebibliography}
+
+\end{document}

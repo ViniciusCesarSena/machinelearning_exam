@@ -1,6 +1,3 @@
-Show! Montei um **README.md** prontinho pra esse repositório — direto ao ponto, bonitinho e com instruções para rodar localmente (Jupyter e Streamlit), estrutura do projeto e notas de troubleshooting.
-
-> Copie e cole o conteúdo abaixo em `README.md` na raiz do repo.
 
 ---
 

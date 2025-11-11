@@ -111,12 +111,6 @@ O app carrega `walmart.csv` e permite explorar interativamente métricas, PCA e 
 
   Se `streamlit` estiver fora do venv, reinstale dentro do venv: `pip install streamlit matplotlib`.
 
-* **Problemas com acentuação (pt-BR) em LaTeX**
-  Garanta no preâmbulo:
-  `\usepackage[utf8]{inputenc}`, `\usepackage[T1]{fontenc}`, `\usepackage[portuguese]{babel}`.
-
-* **Alinhamento de números e R$ em tabelas**
-  Use `siunitx` (`S` columns) e deixe `R$` **apenas no cabeçalho** para manter o alinhamento por decimal.
 
 ---
 
